@@ -1,0 +1,1 @@
+"""LocalNet Messenger - Config Module"""
