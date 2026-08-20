@@ -77,8 +77,18 @@ pip install -r requirements.txt
 
 Сервер можно запустить на любом компьютере в локальной сети:
 
+**Linux/macOS:**
 ```bash
-python -m localnet_messenger.server.server --host 0.0.0.0 --port 8765
+./run_server.sh
+# или
+python server/server.py --host 0.0.0.0 --port 8765
+```
+
+**Windows:**
+```cmd
+run_server.bat
+# или
+python server\server.py --host 0.0.0.0 --port 8765
 ```
 
 **Параметры:**
@@ -86,17 +96,22 @@ python -m localnet_messenger.server.server --host 0.0.0.0 --port 8765
 - `--port` — порт (по умолчанию 8765)
 - `--data-dir` — директория для данных (по умолчанию ./server/data)
 
-**Пример:**
-```bash
-python -m localnet_messenger.server.server --port 8765
-```
-
 ### 2. Запуск клиента
 
 Клиент запускается на компьютерах пользователей:
 
+**Linux/macOS:**
 ```bash
-python -m localnet_messenger.client.client
+./run_client.sh
+# или
+python client/client.py
+```
+
+**Windows:**
+```cmd
+run_client.bat
+# или
+python client\client.py
 ```
 
 При первом запуске:

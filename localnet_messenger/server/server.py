@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 LocalNet Messenger Server
 Main server entry point with WebSocket support and mDNS discovery
@@ -14,9 +15,8 @@ import aiohttp
 from aiohttp import web
 from zeroconf import ServiceInfo, Zeroconf
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from server.database import Database
 from server.handlers.websocket_handler import ConnectionManager, MessageHandler
@@ -87,14 +87,17 @@ class LocalNetServer:
         if self.zeroconf:
             try:
                 if self.service_info:
-                    self.zeroconf.unregister_service(self.service_info)
+                    await self.zeroconf.async_unregister_service(self.service_info)
                 self.zeroconf.close()
             except Exception as e:
-                logger.error(f"Error stopping mDNS: {e}")
+                logger.debug(f"mDNS cleanup: {e}")
         
         # Close all connections
         for user_id in list(self.conn_manager.connections.keys()):
-            await self.db.update_user_status(user_id, 'offline')
+            try:
+                await self.db.update_user_status(user_id, 'offline')
+            except Exception:
+                pass
         
         # Stop web server
         if self.runner:
@@ -152,6 +155,7 @@ class LocalNetServer:
     async def start_mdns(self):
         """Start mDNS service discovery"""
         try:
+            # Use Zeroconf with default interface
             self.zeroconf = Zeroconf()
             
             # Get local IP
@@ -163,9 +167,10 @@ class LocalNetServer:
             finally:
                 s.close()
             
+            # Service name must be <= 15 bytes for mDNS compatibility
             self.service_info = ServiceInfo(
-                "_localnet-messenger._tcp.local.",
-                f"LocalNet Messenger._localnet-messenger._tcp.local.",
+                "_localnet-msg._tcp.local.",
+                f"LocalNetMsg._localnet-msg._tcp.local.",
                 addresses=[socket.inet_aton(local_ip)],
                 port=self.port,
                 properties={
@@ -175,8 +180,8 @@ class LocalNetServer:
                 server=f"{local_ip}.local."
             )
             
-            self.zeroconf.register_service(self.service_info)
-            logger.info(f"mDNS service registered: _localnet-messenger._tcp.local. at {local_ip}:{self.port}")
+            await self.zeroconf.async_register_service(self.service_info)
+            logger.info(f"mDNS service registered: _localnet-msg._tcp.local. at {local_ip}:{self.port}")
             
         except Exception as e:
             logger.warning(f"Could not start mDNS service: {e}")
