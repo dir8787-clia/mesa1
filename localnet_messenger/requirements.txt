@@ -1,0 +1,26 @@
+# LocalNet Messenger Dependencies
+# Core
+PySide6>=6.6.0
+aiohttp>=3.9.0
+aiofiles>=23.2.0
+argon2-cffi>=23.1.0
+cryptography>=41.0.0
+
+# Network discovery
+zeroconf>=0.130.0
+
+# Database
+aiosqlite>=0.19.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+appdirs>=1.4.4
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# Packaging (optional)
+pyinstaller>=6.0.0
