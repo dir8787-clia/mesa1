@@ -10,7 +10,7 @@ from datetime import datetime
 from PySide6.QtWidgets import (
     QApplication, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
     QPushButton, QListWidget, QListWidgetItem, QTextEdit, QSplitter,
-    QWidget, QFrame, QScrollArea, QMessageBox, QMenu, QAction,
+    QWidget, QFrame, QScrollArea, QMessageBox, QMenu,
     QSystemTrayIcon, QComboBox, QFileDialog, QProgressBar, QGroupBox,
     QCheckBox, QSpinBox, QTabWidget, QDialogButtonBox, QFormLayout
 )
