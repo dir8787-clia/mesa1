@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Отчёты - SoftDeploy{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-bar-graph"></i> Отчёты по установленному ПО</h2>
+    <form method="POST" action="{{ url_for('main.update_all_versions') }}" style="display:inline;">
+        <button type="submit" class="btn btn-primary" onclick="return confirm('Обновить версии на всех ПК?')">
+            <i class="bi bi-arrow-repeat"></i> Обновить все версии
+        </button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if report_data %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th rowspan="2">Компьютер</th>
+                        <th rowspan="2">Отдел</th>
+                        {% for package in packages %}
+                        <th colspan="2" class="text-center">{{ package.name }}<br><small>v{{ package.version }}</small></th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for package in packages %}
+                        <th>Версия</th>
+                        <th>Статус</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for host in report_data %}
+                    <tr>
+                        <td>{{ host.hostname }}</td>
+                        <td>{{ host.group }}</td>
+                        {% for package in packages %}
+                        {% set pkg_version = host.versions.get(package.name) %}
+                        <td>{{ pkg_version.version if pkg_version else '-' }}</td>
+                        <td>
+                            {% if pkg_version %}
+                                {% if pkg_version.status == 'installed' %}
+                                <span class="badge bg-success">OK</span>
+                                {% elif pkg_version.status == 'mismatch' %}
+                                <span class="badge bg-warning">Другая</span>
+                                {% else %}
+                                <span class="badge bg-danger">Нет</span>
+                                {% endif %}
+                            {% else %}
+                            <span class="badge bg-secondary">-</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Нет данных для отображения.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

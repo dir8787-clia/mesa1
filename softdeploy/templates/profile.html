@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - SoftDeploy{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person"></i> Профиль пользователя</h2>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <tr><th>Логин:</th><td>{{ user.username }}</td></tr>
+            <tr><th>Роль:</th><td>{{ 'Администратор' if user.role == 'admin' else 'Пользователь' }}</td></tr>
+            <tr><th>Дата регистрации:</th><td>{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</td></tr>
+            <tr><th>Статус:</th><td>{{ 'Активен' if user.is_active else 'Отключен' }}</td></tr>
+        </table>
+    </div>
+</div>
+{% endblock %}

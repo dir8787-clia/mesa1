@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Развёртывание - SoftDeploy{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-rocket"></i> Развёртывание ПО</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Запуск развёртывания</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.run_deploy') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Выберите пакет *</label>
+                        <select class="form-select" name="package_id" required>
+                            <option value="">-- Выберите пакет --</option>
+                            {% for package in packages %}
+                            <option value="{{ package.id }}">{{ package.name }} (v{{ package.version }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Цель развёртывания *</label>
+                        <select class="form-select" name="target_type" id="target_type" onchange="updateTargetOptions()" required>
+                            <option value="all">Все компьютеры</option>
+                            <option value="group">Отдел</option>
+                            <option value="host">Конкретный ПК</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="target_group_div" style="display:none;">
+                        <label class="form-label">Выберите отдел</label>
+                        <select class="form-select" name="target_id" id="target_group">
+                            <option value="">-- Выберите отдел --</option>
+                            {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="target_host_div" style="display:none;">
+                        <label class="form-label">Выберите ПК</label>
+                        <select class="form-select" name="target_id" id="target_host">
+                            <option value="">-- Выберите ПК --</option>
+                            {% for host in hosts %}
+                            <option value="{{ host.id }}">{{ host.hostname }} ({{ host.ip_address or 'No IP' }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Установка будет выполнена только на ПК, где версия отличается от требуемой.
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-rocket"></i> Запустить развёртывание
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Информация</h5>
+            </div>
+            <div class="card-body">
+                <h6>Процесс установки:</h6>
+                <ol>
+                    <li>Проверка версии в реестре Windows</li>
+                    <li>Копирование установщика на ПК</li>
+                    <li>Запуск тихой установки</li>
+                    <li>Удаление установщика</li>
+                </ol>
+                <hr>
+                <a href="{{ url_for('main.deploy_history') }}" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-clock-history"></i> История развёртываний
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateTargetOptions() {
+    const targetType = document.getElementById('target_type').value;
+    document.getElementById('target_group_div').style.display = targetType === 'group' ? 'block' : 'none';
+    document.getElementById('target_host_div').style.display = targetType === 'host' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

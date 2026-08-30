@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SoftDeploy{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar-brand { font-weight: bold; }
+        .sidebar { min-height: calc(100vh - 56px); background: #f8f9fa; border-right: 1px solid #dee2e6; }
+        .sidebar .nav-link { color: #333; padding: 0.75rem 1rem; }
+        .sidebar .nav-link:hover { background: #e9ecef; }
+        .sidebar .nav-link.active { background: #0d6efd; color: white; }
+        .main-content { flex: 1; padding: 2rem; }
+        .card-stat { transition: transform 0.2s; }
+        .card-stat:hover { transform: translateY(-5px); }
+        .flash-messages { position: fixed; top: 70px; right: 20px; z-index: 1050; }
+        .table-actions { white-space: nowrap; }
+        footer { background: #f8f9fa; border-top: 1px solid #dee2e6; padding: 1rem 0; margin-top: auto; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
+                <i class="bi bi-box-seam"></i> SoftDeploy
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2"></i> Панель</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.packages') }}"><i class="bi bi-box"></i> Пакеты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.groups') }}"><i class="bi bi-people"></i> Отделы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.hosts') }}"><i class="bi bi-pc-display"></i> ПК</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.deploy') }}"><i class="bi bi-rocket"></i> Развёртывание</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.reports') }}"><i class="bi bi-file-earmark-bar-graph"></i> Отчёты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.schedules') }}"><i class="bi bi-clock-history"></i> Расписание</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person"></i> Профиль</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.settings') }}"><i class="bi bi-gear"></i> Настройки</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Выйти</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if current_user.is_authenticated %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar d-none d-md-block">
+                <nav class="nav flex-column mt-3">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.dashboard' }}" href="{{ url_for('main.dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Главная
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.packages' }}" href="{{ url_for('main.packages') }}">
+                        <i class="bi bi-box"></i> Пакеты ПО
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.groups' }}" href="{{ url_for('main.groups') }}">
+                        <i class="bi bi-people"></i> Отделы
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.hosts' }}" href="{{ url_for('main.hosts') }}">
+                        <i class="bi bi-pc-display"></i> Компьютеры
+                    </a>
+                    <a class="nav-link {{ 'active' if 'deploy' in request.endpoint }}" href="{{ url_for('main.deploy') }}">
+                        <i class="bi bi-rocket"></i> Развёртывание
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.reports' }}" href="{{ url_for('main.reports') }}">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Отчёты
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.schedules' }}" href="{{ url_for('main.schedules') }}">
+                        <i class="bi bi-clock-history"></i> Расписание
+                    </a>
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.settings' }}" href="{{ url_for('main.settings') }}">
+                        <i class="bi bi-gear"></i> Настройки
+                    </a>
+                </nav>
+            </div>
+            <div class="col-md-10 main-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container mt-5">
+        {% block content %}{% endblock %}
+    </div>
+    {% endif %}
+
+    <footer>
+        <div class="container text-center text-muted">
+            <small>SoftDeploy v1.0 &copy; 2024</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
