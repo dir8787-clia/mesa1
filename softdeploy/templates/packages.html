@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Пакеты ПО - SoftDeploy{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-box"></i> Пакеты программного обеспечения</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPackageModal">
+        <i class="bi bi-plus-circle"></i> Добавить пакет
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if packages %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Приложение в реестре</th>
+                    <th>Версия</th>
+                    <th>Файл</th>
+                    <th>Ключи установки</th>
+                    <th>Цель</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                <tr>
+                    <td>{{ package.name }}</td>
+                    <td>{{ package.app_name }}</td>
+                    <td><span class="badge bg-info">{{ package.version }}</span></td>
+                    <td><small>{{ package.filename }}</small></td>
+                    <td><code>{{ package.silent_keys or '-' }}</code></td>
+                    <td>
+                        {% if package.deploy_to_all %}
+                        <span class="badge bg-success">Все ПК</span>
+                        {% else %}
+                        {% for group in package.target_groups %}
+                        <span class="badge bg-secondary">{{ group.name }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td class="table-actions">
+                        <form method="POST" action="{{ url_for('main.delete_package', package_id=package.id) }}" 
+                              style="display:inline;" onsubmit="return confirm('Удалить пакет?')">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">Пакеты не добавлены.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Add Package -->
+<div class="modal fade" id="addPackageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('main.add_package') }}" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление пакета ПО</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Название пакета *</label>
+                        <input type="text" class="form-control" name="name" required placeholder="Adobe Reader DC">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Имя приложения в реестре *</label>
+                        <input type="text" class="form-control" name="app_name" required placeholder="Adobe Reader DC">
+                        <small class="text-muted">Точное имя из HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Версия *</label>
+                        <input type="text" class="form-control" name="version" required placeholder="2023.006.20360">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Файл установщика (.exe или .msi) *</label>
+                        <input type="file" class="form-control" name="file" accept=".exe,.msi" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ключи тихой установки</label>
+                        <input type="text" class="form-control" name="silent_keys" placeholder="/S /norestart">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="deploy_to_all" id="deploy_to_all">
+                            <label class="form-check-label" for="deploy_to_all">Устанавливать на все ПК</label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="target_groups_div">
+                        <label class="form-label">Целевые отделы</label>
+                        <select class="form-select" name="target_groups" multiple size="4">
+                            {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Ctrl+Click для выбора нескольких</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

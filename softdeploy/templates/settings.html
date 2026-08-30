@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Настройки - SoftDeploy{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-gear"></i> Настройки системы</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-telegram"></i> Telegram уведомления</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.update_telegram_settings') }}">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="telegram_enabled" id="telegram_enabled" {{ 'checked' if telegram_config.enabled else '' }}>
+                        <label class="form-check-label" for="telegram_enabled">Включить уведомления</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bot Token</label>
+                        <input type="text" class="form-control" name="bot_token" value="{{ telegram_config.bot_token or '' }}" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Chat ID</label>
+                        <input type="text" class="form-control" name="chat_id" value="{{ telegram_config.chat_id or '' }}" placeholder="-1001234567890">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Сохранить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Информация о системе</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><td>Версия:</td><td>1.0.0</td></tr>
+                    <tr><td>Python:</td><td>{{ python_version|default('3.x') }}</td></tr>
+                    <tr><td>База данных:</td><td>SQLite</td></tr>
+                    <tr><td>Планировщик:</td><td>APScheduler</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Безопасность</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Пароли хешируются через werkzeug</li>
+                    <li>Ansible vault для чувствительных данных</li>
+                    <li>CSRF защита включена</li>
+                    <li>Только .exe и .msi файлы</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

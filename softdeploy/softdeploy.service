@@ -1,0 +1,25 @@
+[Unit]
+Description=SoftDeploy - Software Deployment System for Windows Domain
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/srv/softdeploy
+Environment="PATH=/srv/softdeploy/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="WINRM_USER=administrator@vdk.local"
+Environment="WINRM_PASSWORD=CHANGE_ME_IN_VAULT"
+ExecStart=/srv/softdeploy/venv/bin/gunicorn --bind 0.0.0.0:8080 --workers 4 --timeout 120 "app:create_app()"
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=softdeploy
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/softdeploy/packages /srv/softdeploy/logs /srv/softdeploy/reports /srv/softdeploy/softdeploy.db
+
+[Install]
+WantedBy=multi-user.target

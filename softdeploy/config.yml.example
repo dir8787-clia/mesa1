@@ -1,0 +1,45 @@
+# SoftDeploy Configuration
+
+# Database
+database:
+  path: /srv/softdeploy/softdeploy.db
+
+# Flask settings
+flask:
+  secret_key: "CHANGE_THIS_SECRET_KEY_IN_PRODUCTION"
+  debug: false
+
+# WinRM settings for Ansible
+winrm:
+  port: 5985
+  transport: ntlm  # или kerberos
+  username: "administrator@vdk.local"
+  # Пароль хранится в ansible-vault, не здесь!
+  
+# Domain settings
+domain:
+  name: "vdk.local"
+  realm: "VDK.LOCAL"
+
+# Telegram notifications
+telegram:
+  enabled: false
+  bot_token: ""
+  chat_id: ""
+
+# File paths
+paths:
+  packages: /srv/softdeploy/packages
+  logs: /srv/softdeploy/logs
+  reports: /srv/softdeploy/reports
+  
+# Security
+security:
+  vault_key_file: /srv/softdeploy/ansible_vault_key.txt
+  allowed_extensions: [".exe", ".msi"]
+  max_file_size_mb: 500
+
+# Scheduler
+scheduler:
+  enabled: true
+  timezone: "Europe/Moscow"
