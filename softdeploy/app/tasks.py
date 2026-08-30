@@ -246,7 +246,7 @@ try {{
       
     - name: Report result
       debug:
-        msg: "Installation completed with rc={{% raw %}}{{{{ install_result.rc }}}}{% endraw %}"
+        msg: "Installation completed"
       when: check_result.rc != 0
 '''
     
@@ -300,7 +300,7 @@ Get-ItemProperty HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersio
       
     - name: Save result
       ansible.windows.win_copy:
-        content: "{{% raw %}}{{{{ installed_software.stdout }}}}{% endraw %}"
+        content: "{{ installed_software.stdout | to_json }}"
         dest: C:\\Windows\\Temp\\installed_software.json
 '''
     

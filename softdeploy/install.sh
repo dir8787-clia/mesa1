@@ -32,9 +32,14 @@ apt-get install -y \
     ansible \
     krb5-user \
     libkrb5-dev \
-    winrm \
     git \
-    curl
+    curl \
+    gcc \
+    pkg-config \
+    libffi-dev \
+    libssl-dev \
+    sqlite3 \
+    jq || { echo "❌ Ошибка установки зависимостей"; exit 1; }
 
 # Создание виртуального окружения
 echo "[3/8] Создание Python virtualenv..."
@@ -44,19 +49,7 @@ source /srv/softdeploy/venv/bin/activate
 # Установка Python зависимостей
 echo "[4/8] Установка Python пакетов..."
 pip install --upgrade pip
-pip install \
-    Flask==3.0.0 \
-    Flask-Login==0.6.3 \
-    Flask-SQLAlchemy==3.1.1 \
-    Flask-WTF==1.2.1 \
-    Werkzeug==3.0.1 \
-    SQLAlchemy==2.0.23 \
-    APScheduler==3.10.4 \
-    PyYAML==6.0.1 \
-    requests==2.31.0 \
-    ansible==9.0.0 \
-    pywinrm==0.4.3 \
-    pypsrp==0.8.1
+cd /srv/softdeploy && pip install -r requirements.txt || { echo "❌ Ошибка установки Python пакетов"; exit 1; }
 
 # Копирование файлов приложения
 echo "[5/8] Копирование файлов приложения..."
